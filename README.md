@@ -5,7 +5,7 @@ created by **@royalrizen** on Discord
 
 <br> 
 
-> [!NOTE]
+> [!CAUTION]
 > You will have to edit the [settings.yaml](https://github.com/Richard0070/Melody-Discord-Bot/blob/main/settings.yaml) file before hosting the bot. It acts as the dashboard.
 
 <br> 
