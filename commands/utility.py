@@ -1,12 +1,14 @@
 import discord
 from discord.ext import commands
 import config 
+from utils.staff import is_staff
 
 class Utility(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(name="userinfo", aliases=["whois", "user"], usage="<user>", description="Fetch information about a user")
+    @commands.check(is_staff)
     async def whois(self, ctx, member: discord.User = None):    
         if member is None:
             member = ctx.author 
