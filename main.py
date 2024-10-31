@@ -13,6 +13,7 @@ with open('settings.yaml', 'r') as file:
   settings = yaml.safe_load(file)        
   prefix  = settings['prefix']    
   developer = settings['developer']
+  bug_reports_channel = settings['log_channels']['bug_reports']
         
 bot = commands.Bot(command_prefix=prefix, case_insensitive=True, intents=discord.Intents.all())
 
@@ -49,7 +50,7 @@ class ReportButton(View):
         self.original_message = original_message  
     @discord.ui.button(label='Report Bug', style=discord.ButtonStyle.gray, emoji=config.BUG, custom_id="bugbtn")
     async def send_error_report(self, interaction: discord.Interaction, button: discord.ui.Button):
-        report_channel = self.bot.get_channel(1209441824641384479) 
+        report_channel = self.bot.get_channel(bug_reports_channel) 
         if report_channel:
             report_content = (
                 f"## {config.BUG} Bug Report\n** **\n"
