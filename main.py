@@ -8,11 +8,11 @@ import time
 import os 
 import yaml 
 import web 
+from utils.staff import is_dev
 
 with open('settings.yaml', 'r') as file:
   settings = yaml.safe_load(file)        
-  prefix  = settings['prefix']    
-  developer = settings['developer']
+  prefix  = settings['prefix']
   bug_reports_channel = settings['log_channels']['bug_reports']
         
 bot = commands.Bot(command_prefix=prefix, case_insensitive=True, intents=discord.Intents.all())
