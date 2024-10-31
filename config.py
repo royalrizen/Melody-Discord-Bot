@@ -1,3 +1,5 @@
+import os
+
 # ENVIRONMENT VARIABLES 
 TOKEN = os.getenv['TOKEN']
 UPLOADER_TECH_API_KEY = os.getenv['UPLOADER_TECH_API_KEY']
