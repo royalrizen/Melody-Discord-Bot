@@ -7,6 +7,7 @@ import asyncio
 import time
 import os 
 import yaml 
+import web 
 
 with open('settings.yaml', 'r') as file:
   settings = yaml.safe_load(file)        
@@ -140,5 +141,7 @@ async def eval_command(ctx, *, code):
 async def on_message(message):
     if not message.author.bot:
         await bot.process_commands(message)
-        
+
+bot.remove_command('help')
+web.keep_alive()
 bot.run(config.TOKEN)                
