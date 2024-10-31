@@ -22,7 +22,7 @@ created by **@royalrizen** on Discord
 
 ## Hosting 
 
-You can use [render.com](https://render.com) to host your own private instance. Create a web service and import the GitHub repository. Add the necessary environment variables and deploy. Now, go to [cron-jobs](https://cron-job.org/en/) website and create a new ping service using the flask web server url obtained from render's dashboard.
+You can use [render.com](https://render.com) to host your own private instance. Create a web service and import the GitHub repository. Add the necessary environment variables and deploy. You also need to create a blueprint in render using the existing render.yaml in this repo. Just sync it with your bot instance. Now, go to [cron-jobs](https://cron-job.org/en/) website and create a new ping service using the flask web server url obtained from render's dashboard.
 
 <br>
 
