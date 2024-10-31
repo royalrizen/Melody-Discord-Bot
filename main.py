@@ -11,7 +11,8 @@ import web
 
 with open('settings.yaml', 'r') as file:
   settings = yaml.safe_load(file)        
-  prefix  = settings['prefix']               
+  prefix  = settings['prefix']    
+  developer = settings['developer']
         
 bot = commands.Bot(command_prefix=prefix, case_insensitive=True, intents=discord.Intents.all())
 
@@ -81,8 +82,7 @@ async def on_command_error(ctx, error):
      	await ctx.reply(error, allowed_mentions=discord.AllowedMentions.none())
      	       
 async def is_dev(ctx):
-    allowed_ids = [918862839316373554]
-    return ctx.author.id in allowed_ids
+    return ctx.author.id in developer
 
 async def evaluate(ctx, code):
     try:
