@@ -16,4 +16,4 @@ created by **@royalrizen** on Discord
 
 ## Hosting 
 
-You can use [render.com](https://render.com) to host your own private instance. Go to cron-jobs website and create a new ping service using the flask web server url obtained from render's dashboard.
+You can use [render.com](https://render.com) to host your own private instance. Create a web service and import the GitHub repository. Add the necessary environment variables and deploy. Now, go to [cron-jobs](https://cron-job.org/en/) website and create a new ping service using the flask web server url obtained from render's dashboard.
