@@ -6,8 +6,13 @@ import traceback
 import asyncio 
 import time
 import os 
+import yaml 
 
-bot = commands.Bot(command_prefix="!",case_insensitive=True, intents=discord.Intents.all())
+with open('settings.yaml', 'r') as file:
+  settings = yaml.safe_load(file)        
+  prefix  = settings['prefix']               
+        
+bot = commands.Bot(command_prefix=prefix, case_insensitive=True, intents=discord.Intents.all())
 
 @bot.event
 async def on_ready():
