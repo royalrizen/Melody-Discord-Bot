@@ -1,1 +1,8 @@
 prefix: "!"
+
+developer: [918862839316373554] # gives access to eval command, etc
+
+log_channels:
+  message_logs: 1265641315690090577
+  case_logs: 1265641369939083295
+  bug_reports: 1209441824641384479
