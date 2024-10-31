@@ -82,9 +82,6 @@ async def on_command_error(ctx, error):
     else:
      	await ctx.reply(error, allowed_mentions=discord.AllowedMentions.none())
      	       
-async def is_dev(ctx):
-    return ctx.author.id in developer
-
 async def evaluate(ctx, code):
     try:
         result = eval(code)
