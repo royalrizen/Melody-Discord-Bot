@@ -7,7 +7,7 @@ class GoogleMaps(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.command(name="map", aliases=["google_map", "maps", "gmap", "searchmap"], usage="<location>", description="Search any location on Google Maps")
     async def map(self, ctx, *, location: str):
         m = await ctx.send(f"🔎 *Searching for **'{location}'** on Google Maps...*")
 
