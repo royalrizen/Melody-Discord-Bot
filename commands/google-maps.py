@@ -14,7 +14,7 @@ class GoogleMaps(commands.Cog):
 
         try:
             async with async_playwright() as p:
-                browser = await p.chromium.launch(headless=False)
+                browser = await p.chromium.launch(headless=True)  # Set headless to True
                 page = await browser.new_page()
 
                 await page.goto("https://www.google.com/maps")
@@ -23,11 +23,20 @@ class GoogleMaps(commands.Cog):
                 await page.fill("input[aria-label='Search Google Maps']", location)
                 await page.press("input[aria-label='Search Google Maps']", "Enter")
                 
-                await page.wait_for_selector("canvas", timeout=60000)  # Wait for map canvas to load
+                # Wait for map content to load
+                await page.wait_for_selector("canvas", timeout=60000)
 
                 screenshot_path = "google_maps_screenshot.png"
-                map_element = await page.query_selector("canvas")
-                await map_element.screenshot(path=screenshot_path)
+                
+                # Try capturing the map area
+                try:
+                    map_element = await page.query_selector("canvas")
+                    await map_element.screenshot(path=screenshot_path)
+                except:
+                    # Alternate selector in case `canvas` does not work
+                    map_element = await page.query_selector("div[data-qa='map']")
+                    await map_element.screenshot(path=screenshot_path)
+
                 await browser.close()
 
             await m.delete()
@@ -35,10 +44,10 @@ class GoogleMaps(commands.Cog):
             os.remove(screenshot_path)
         except Exception as e:
             await m.delete()
-            error_message = f"Error: {str(e)}"
+            error_message = f"⚠️ An error occurred: {str(e)}"
             traceback_info = traceback.format_exc()
 
-            if len(traceback_info) > 2000:
+            if len(traceback_info) > 4000:
                 for i in range(0, len(traceback_info), 2000):
                     await ctx.send(traceback_info[i:i + 2000])
             else:
