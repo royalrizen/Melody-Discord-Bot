@@ -33,7 +33,7 @@ class Fun(commands.Cog):
                 video_url = result['video']
                 image_url = result['image']
 
-                result_embed = discord.Embed(title=f"{title} ({native_title})", color=0xffddf9)
+                result_embed = discord.Embed(title=f"{title} ({native_title})", color=config.PINK_COLOR)
                 result_embed.description = f"- Similarity: **`{similarity:.2f}%`**\n- Episode: **`{episode}`**\n- From: **`{from_time}`**\n- To: **`{to_time}`**\n- NSFW: **`{is_adult}`**"
                 result_embed.set_image(url=image_url)
 
