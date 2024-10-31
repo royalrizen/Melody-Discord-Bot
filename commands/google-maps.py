@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from playwright.async_api import async_playwright
 import os
+import traceback
 
 class GoogleMaps(commands.Cog):
     def __init__(self, bot):
@@ -11,23 +12,29 @@ class GoogleMaps(commands.Cog):
     async def map(self, ctx, *, location: str):
         m = await ctx.send(f"🔎 *Searching for **'{location}'** on Google Maps...*")
 
-        async with async_playwright() as p:
-            browser = await p.chromium.launch()
-            page = await browser.new_page()
+        try:
+            async with async_playwright() as p:
+                browser = await p.chromium.launch(headless=False)
+                page = await browser.new_page()
 
-            await page.goto("https://www.google.com/maps")
-            await page.fill("input[aria-label='Search Google Maps']", location)
-            await page.press("input[aria-label='Search Google Maps']", "Enter")
+                await page.goto("https://www.google.com/maps")
+                await page.wait_for_load_state("networkidle")
+                await page.wait_for_selector("input[aria-label='Search Google Maps']", timeout=60000)
+                await page.fill("input[aria-label='Search Google Maps']", location)
+                await page.press("input[aria-label='Search Google Maps']", "Enter")
+                await page.wait_for_selector("div[data-qa='map']", timeout=60000)
 
-            await page.wait_for_load_state("networkidle")
+                screenshot_path = "google_maps_screenshot.png"
+                await page.screenshot(path=screenshot_path, full_page=True)
+                await browser.close()
 
-            screenshot_path = "google_maps_screenshot.png"  # Change the path if needed
-            await page.screenshot(path=screenshot_path, full_page=True)
-            await browser.close()
-
-        await m.delete()
-        await ctx.send(file=discord.File(screenshot_path))
-        os.remove(screenshot_path)
+            await m.delete()
+            await ctx.send(file=discord.File(screenshot_path))
+            os.remove(screenshot_path)
+        except Exception as e:
+            await m.delete()
+            error_message = f"⚠️ GoogleMaps - {str(e)}\n{traceback.format_exc()}"
+            await ctx.send(error_message)
 
 async def setup(bot):
     await bot.add_cog(GoogleMaps(bot))
