@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import yaml
 import time
+import config
 
 class Logging(commands.Cog):
     def __init__(self, bot):
@@ -22,7 +23,7 @@ class Logging(commands.Cog):
             timestamp = int(time.time())
             message_url = f"https://discord.com/channels/{message.guild.id}/{message.channel.id}/{message.id}"
 
-            embed = discord.Embed(description=f"**🗑️ [MESSAGE DELETED]({message_url})**", color=0xff3100)
+            embed = discord.Embed(description=f"**🗑️ [MESSAGE DELETED]({message_url})**", color=config.PRIMARY_COLOR)
 
             embed.add_field(
                 name=f"in #{message.channel.name} ({message.channel.id})", 
@@ -73,7 +74,7 @@ class Logging(commands.Cog):
             timestamp = int(time.time())
             message_url = f"https://discord.com/channels/{before.guild.id}/{before.channel.id}/{before.id}"
 
-            embed = discord.Embed(description=f"**📝 [MESSAGE EDITED]({message_url})**", color=0xd1bcbc)
+            embed = discord.Embed(description=f"**📝 [MESSAGE EDITED]({message_url})**", color=config.SECONDARY_COLOR)
 
             embed.add_field(
                 name=f"in #{before.channel.name} ({before.channel.id})", 
