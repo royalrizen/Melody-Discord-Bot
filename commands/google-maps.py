@@ -47,7 +47,7 @@ class GoogleMaps(commands.Cog):
             error_message = f"⚠️ {str(e)}"
             traceback_info = traceback.format_exc()
 
-            if len(traceback_info) > 4000:
+            if len(traceback_info) > 2000:
                 for i in range(0, len(traceback_info), 2000):
                     await ctx.send(traceback_info[i:i + 2000])
             else:
