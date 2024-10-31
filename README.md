@@ -4,7 +4,7 @@ created by **@royalrizen** on Discord
 ---
 
 > [!IMPORTANT]
-> You can edit settings.yaml file. It acts as the bot's dashboard.
+> You can edit [settings.yaml](https://github.com/Richard0070/Melody-Discord-Bot/blob/main/settings.yaml) file. It acts as the bot's dashboard.
 
 ## Environment Variables
 
