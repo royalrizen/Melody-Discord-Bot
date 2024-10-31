@@ -33,8 +33,14 @@ class GoogleMaps(commands.Cog):
             os.remove(screenshot_path)
         except Exception as e:
             await m.delete()
-            error_message = f"⚠️ GoogleMaps - {str(e)}\n{traceback.format_exc()}"
-            await ctx.send(error_message)
+            error_message = f"⚠️ An error occurred: {str(e)}"
+            traceback_info = traceback.format_exc()
 
+            if len(traceback_info) > 4000:
+              for i in range(0, len(traceback_info), 2000):
+              await ctx.send(traceback_info[i:i + 2000])
+            else:
+              await ctx.send(error_message + "\n" + traceback_info)
+           
 async def setup(bot):
     await bot.add_cog(GoogleMaps(bot))
