@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands
 from playwright.async_api import async_playwright
 import os
-import asyncio 
 
 class Screenshot(commands.Cog):
     def __init__(self, bot):
