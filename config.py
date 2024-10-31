@@ -1,9 +1,9 @@
 import os
 
 # ENVIRONMENT VARIABLES 
-TOKEN = os.getenviron['TOKEN']
-UPLOADER_TECH_API_KEY = os.getenviron['UPLOADER_TECH_API_KEY']
-NASA_API_KEY = os.getenviron['NASA_API_KEY']
+TOKEN = os.environ['TOKEN']
+UPLOADER_TECH_API_KEY = os.environ['UPLOADER_TECH_API_KEY']
+NASA_API_KEY = os.environ['NASA_API_KEY']
 
 # COLORS
 PRIMARY_COLOR = 0xFF0000 # red
