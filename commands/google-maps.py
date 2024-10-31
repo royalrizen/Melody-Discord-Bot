@@ -14,17 +14,18 @@ class GoogleMaps(commands.Cog):
 
         try:
             async with async_playwright() as p:
-                browser = await p.chromium.launch(headless=True, slow_mo=500)  # slow_mo adds a delay
+                browser = await p.chromium.launch(headless=True)
                 page = await browser.new_page()
 
                 await page.goto("https://www.google.com/maps", timeout=120000)
                 await page.wait_for_load_state("networkidle")
 
-                # Alternative selector for the search input box
                 await page.wait_for_selector("#searchboxinput", timeout=60000)
                 await page.fill("#searchboxinput", location)
                 await page.press("#searchboxinput", "Enter")
 
+                # Wait for the map to load
+                await page.wait_for_timeout(3000)  # Wait for a few seconds to allow the map to load
                 await page.wait_for_selector("canvas", timeout=60000)
 
                 screenshot_path = "google_maps_screenshot.png"
@@ -33,7 +34,6 @@ class GoogleMaps(commands.Cog):
                     map_element = await page.query_selector("canvas")
                     await map_element.screenshot(path=screenshot_path)
                 except:
-                    # Alternate method if `canvas` fails
                     map_element = await page.query_selector("div[data-qa='map']")
                     await map_element.screenshot(path=screenshot_path)
 
