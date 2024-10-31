@@ -13,3 +13,7 @@ created by **@royalrizen** on Discord
 | `TOKEN`                 | Discord bot token          |
 | `UPLOADER_TECH_API_KEY` | API key for [uploader.tech](https://uploader.tech/)   |
 | `NASA_API_KEY`          | NASA API Key               |
+
+## Hosting 
+
+You can use [render.com](https://render.com) to host your own private instance. Go to cron-jobs website and create a new ping service using the flask web server url obtained from render's dashboard.
