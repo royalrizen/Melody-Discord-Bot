@@ -1,0 +1,21 @@
+services:
+- type: web
+  name: Melody
+  runtime: python
+  repo: https://github.com/Richard0070/Melody-Discord-Bot
+  plan: free
+  envVars:
+  - key: UPLOADER_TECH_API_KEY
+    sync: false
+  - key: NASA_API_KEY
+    sync: false
+  - key: TOKEN
+    sync: false
+  - key: PLAYWRIGHT_BROWSERS_PATH
+    value: /opt/render/project/playwright
+  region: oregon
+  buildCommand: |
+    pip install -r requirements.txt
+    bash install_playwright.sh
+  startCommand: python main.py
+version: "1"
