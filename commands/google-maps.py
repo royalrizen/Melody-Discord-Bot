@@ -35,7 +35,7 @@ class GoogleMaps(commands.Cog):
                     }
                 }""")
                 
-                await asyncio.sleep(2)
+                await asyncio.sleep(5)
                 
                 map_element = await page.query_selector("canvas")
                 if map_element:
