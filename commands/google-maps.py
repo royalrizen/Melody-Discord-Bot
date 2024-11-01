@@ -4,6 +4,7 @@ from playwright.async_api import async_playwright
 import os
 import asyncio
 from PIL import Image
+import config
 
 class GoogleMaps(commands.Cog):
     def __init__(self, bot):
@@ -11,11 +12,12 @@ class GoogleMaps(commands.Cog):
 
     @commands.command(name="map", aliases=["google_map", "maps", "gmap", "searchmap"], usage="<location>", description="Search any location on Google Maps")
     async def map(self, ctx, *, location: str):
-        m1 = await ctx.send(f"🔎 *Searching for **'{location}'** on Google Maps...*")
-        screenshot_path = "google_maps_screenshot.png"
-        cropped_image_path = "google_maps_cropped.png"
-
+        screenshot_path = "google_maps.png"
+        cropped_image_path = "google_maps_screenshot.png"
+        
         try:
+            await ctx.message.add_reaction(config.GOOGLE_SEARCH)
+
             location_url = location.replace(" ", "+")
             google_maps_url = f"https://google.com/maps/place/{location_url}"
             
@@ -23,12 +25,14 @@ class GoogleMaps(commands.Cog):
                 browser = await p.chromium.launch(headless=True)
                 page = await browser.new_page()
 
-                # Navigate to Google Maps
                 await page.goto(google_maps_url, timeout=120000)
                 await page.wait_for_load_state("networkidle")
                 await ctx.send("*Loaded Google Maps for the specified location...*")
+
+                await page.wait_for_selector("button[aria-label='Collapse side panel']", timeout=60000)
+                await page.evaluate("document.querySelector('button[aria-label=\"Collapse side panel\"]').click()")
+                await asyncio.sleep(2)
                 
-                # Wait for the map canvas and take a screenshot
                 retry_count = 3
                 for attempt in range(retry_count):
                     try:
@@ -36,29 +40,28 @@ class GoogleMaps(commands.Cog):
                         map_element = await page.query_selector("canvas")
                         if map_element:
                             await map_element.screenshot(path=screenshot_path)              
-                            await ctx.send("*Screenshot taken successfully!*")
                             break
                     except:
                         if attempt < retry_count - 1:
-                            await ctx.send(f"Retrying to capture screenshot... Attempt {attempt + 1}/{retry_count}")
                             await asyncio.sleep(2)
                         else:
-                            await ctx.send("⚠️ Unable to capture the map screenshot.")
+                            await ctx.send(f"{config.ERROR} Unable to capture the map screenshot.")
                             return
 
                 await browser.close()
             
-            # Crop the screenshot to remove whitespace
             crop_white_space(screenshot_path, cropped_image_path)
-            
-            await m1.delete()            
-            await ctx.send(file=discord.File(cropped_image_path))
+
+            embed = discord.Embed(title="Google Maps", description=f"Location: **`{location}`**", color=discord.Color.blue())
+            file = discord.File(cropped_image_path, filename="map.png")
+            embed.set_image(url="attachment://map.png")
+            await ctx.send(embed=embed, file=file)
         
         except Exception as e:
             await ctx.send(f"⚠️ An error occurred: {str(e)}")
 
         finally:
-            # Clean up local files
+            await ctx.message.clear_reactions()
             if os.path.exists(screenshot_path):
                 os.remove(screenshot_path)
             if os.path.exists(cropped_image_path):
@@ -73,7 +76,7 @@ def crop_white_space(image_path, output_path):
     for y in range(image.height):
         for x in range(image.width):
             r, g, b, a = data[y * image.width + x]
-            if (r, g, b) != (255, 255, 255):  # Detect non-white pixels
+            if (r, g, b) != (255, 255, 255): 
                 if x < bbox[0]:
                     bbox[0] = x
                 if y < bbox[1]:
