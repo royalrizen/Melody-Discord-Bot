@@ -51,7 +51,7 @@ class GoogleMaps(commands.Cog):
             crop_white_space(screenshot_path, cropped_image_path)
 
             embed = discord.Embed(title="Google Maps", description=f"Location: **`{location}`**", color=config.PRIMARY_COLOR)
-            embed.set_thumbnail(url="https://cdn.discordapp.com/emojis/858112834541715498.png")
+            embed.set_author(icon_url="https://cdn.discordapp.com/emojis/858112834541715498.png")
             file = discord.File(cropped_image_path, filename="map.png")
             embed.set_image(url="attachment://map.png")
             await ctx.send(embed=embed, file=file)
