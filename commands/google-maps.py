@@ -3,6 +3,7 @@ from discord.ext import commands
 from playwright.async_api import async_playwright
 import os
 import traceback
+import asyncio 
 
 class GoogleMaps(commands.Cog):
     def __init__(self, bot):
@@ -32,6 +33,7 @@ class GoogleMaps(commands.Cog):
                 await page.wait_for_timeout(3000)
                 m4 = await ctx.send("*Waiting for Google Maps canvas to load...*")
 
+                await asyncio.sleep(5)
                 map_element = await page.query_selector("canvas")
                 if map_element:
                     await map_element.screenshot(path=screenshot_path)              
