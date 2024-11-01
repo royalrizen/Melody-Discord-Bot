@@ -57,7 +57,7 @@ class GoogleMaps(commands.Cog):
             await ctx.send(embed=embed, file=file)
         
         except Exception as e:
-            await ctx.send(f"⚠️ An error occurred: {str(e)}")
+            print(e)
 
         finally:
             await ctx.message.clear_reactions()
