@@ -10,7 +10,7 @@ class GoogleMaps(commands.Cog):
 
     @commands.command(name="map", aliases=["google_map", "maps", "gmap", "searchmap"], usage="<location>", description="Search any location on Google Maps")
     async def map(self, ctx, *, location: str):
-        m = await ctx.send(f"🔎 *Searching for **'{location}'** on Google Maps...*")
+        m1 = await ctx.send(f"🔎 *Searching for **'{location}'** on Google Maps...*")
         screenshot_path = "google_maps_screenshot.png"
         
         try:
@@ -22,25 +22,37 @@ class GoogleMaps(commands.Cog):
                 await page.goto("https://www.google.com/maps", timeout=120000)
                 await page.wait_for_load_state("networkidle")
 
+                m2 = await ctx.send("*Loaded Google Maps...*")
                 # Fill the search box with the location and press Enter
                 await page.wait_for_selector("#searchboxinput", timeout=60000)
                 await page.fill("#searchboxinput", location)
                 await page.press("#searchboxinput", "Enter")
 
+                
+                m3 = await ctx.send("*Filling search box...*")
                 # Wait for the map canvas to load and stabilize
                 await page.wait_for_selector("canvas", timeout=60000)
                 await page.wait_for_timeout(3000)
 
+                
+                m4 = await ctx.send("*Waiting for Google Maps canvas to load...*")
+
                 # Take a screenshot of the map area
                 map_element = await page.query_selector("canvas")
                 if map_element:
-                    await map_element.screenshot(path=screenshot_path)
+                    await map_element.screenshot(path=screenshot_path)              
+                    m5 = await ctx.send("*Took screenshot...*")
                 else:
                     raise Exception("Map canvas not found.")
 
                 await browser.close()
             
-            await m.delete()
+            await m1.delete()            
+            await m2.delete()            
+            await m3.delete()
+            await m4.delete()
+            await m5.delete()
+            
             await ctx.send(file=discord.File(screenshot_path))
         
         except Exception as e:
