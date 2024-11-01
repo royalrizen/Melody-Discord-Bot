@@ -24,7 +24,7 @@ class GoogleMaps(commands.Cog):
                 
                 await page.wait_for_selector("#searchboxinput", timeout=60000)                
                 await page.fill("#searchboxinput", location)
-                await page.keyboard.press("Enter")
+                await page.click("#searchbox-searchbutton")
                 m3 = await ctx.send("*Filling search box...*")
                 
                 await page.wait_for_selector("canvas", timeout=60000)
