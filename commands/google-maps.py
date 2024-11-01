@@ -9,6 +9,13 @@ from PIL import Image
 class GoogleMaps(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.browser = None 
+
+    async def get_browser(self):
+        if self.browser is None:
+            async with async_playwright() as p:
+                self.browser = await p.chromium.launch(headless=True)
+        return self.browser
 
     @commands.command(name="map", aliases=["google_map", "maps", "gmap", "searchmap"], usage="<location>", description="Search any location on Google Maps")
     async def map(self, ctx, *, location: str):
@@ -20,36 +27,27 @@ class GoogleMaps(commands.Cog):
             location_url = location.replace(" ", "+")
             google_maps_url = f"https://google.com/maps/place/{location_url}"
             
-            async with async_playwright() as p:
-                browser = await p.chromium.launch(headless=True)
-                page = await browser.new_page()
+            browser = await self.get_browser()
+            page = await browser.new_page()
 
-                await page.goto(google_maps_url, timeout=120000)
-                await page.wait_for_load_state("networkidle")
-                await ctx.send("*Loaded Google Maps for the specified location...*")
-                
-                await page.wait_for_selector("button[aria-label='Collapse side panel']", timeout=60000)
-                await page.evaluate("document.querySelector('button[aria-label=\"Collapse side panel\"]').click()")
-                await asyncio.sleep(2)
-                
-                await page.wait_for_selector("canvas", timeout=60000)
-                await asyncio.sleep(2)
-                
-                map_element = await page.query_selector("canvas")
-                if map_element:
-                    await map_element.screenshot(path=screenshot_path)              
-                    await ctx.send("*Taking screenshot...*")
-                else:
-                    raise Exception("Map canvas not found.")
-
-                await browser.close()
-
-            # Crop the screenshot
-            crop_white_space(screenshot_path, cropped_image_path)
+            await page.goto(google_maps_url, timeout=120000)
+            await page.wait_for_load_state("networkidle")
+            await ctx.send("*Loaded Google Maps for the specified location...*")
             
-            await m1.delete()            
-            await ctx.send(file=discord.File(cropped_image_path))
-        
+            await page.wait_for_selector("button[aria-label='Collapse side panel']", timeout=60000)
+            await page.evaluate("document.querySelector('button[aria-label=\"Collapse side panel\"]').click()")
+            await asyncio.sleep(2)
+            
+            await page.wait_for_selector("canvas", timeout=60000)
+            await asyncio.sleep(2)
+            
+            map_element = await page.query_selector("canvas")
+            if map_element:
+                await map_element.screenshot(path=screenshot_path)              
+                await ctx.send("*Taking screenshot...*")
+            else:
+                raise Exception("Map canvas not found.")
+
         except Exception as e:
             error_message = f"⚠️ {str(e)}"
             traceback_info = traceback.format_exc()
@@ -61,6 +59,12 @@ class GoogleMaps(commands.Cog):
                 await ctx.send(error_message + "\n" + traceback_info)
 
         finally:
+            # Crop the screenshot
+            crop_white_space(screenshot_path, cropped_image_path)
+            
+            await m1.delete()            
+            await ctx.send(file=discord.File(cropped_image_path))
+            await page.close()  # Close the page but keep the browser open
             if os.path.exists(screenshot_path):
                 os.remove(screenshot_path)
             if os.path.exists(cropped_image_path):
