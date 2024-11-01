@@ -24,7 +24,7 @@ class GoogleMaps(commands.Cog):
                 
                 await page.wait_for_selector("#searchboxinput", timeout=60000)                
                 await page.fill("#searchboxinput", location)
-                await page.wait_for_timeout(500) 
+                await page.wait_for_timeout(1000) 
                 await page.evaluate("document.querySelector('#searchbox-searchbutton').click()")
                 m3 = await ctx.send("*Filling search box...*")
                 
