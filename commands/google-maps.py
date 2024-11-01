@@ -27,6 +27,14 @@ class GoogleMaps(commands.Cog):
                 await ctx.send("*Loaded Google Maps for the specified location...*")
                 
                 await page.wait_for_selector("canvas", timeout=60000)
+
+                await page.evaluate("""() => {
+                    const collapseButton = document.querySelector('[aria-label="Collapse side panel"]');
+                    if (collapseButton) {
+                        collapseButton.click();
+                    }
+                }""")
+                
                 await asyncio.sleep(2)
                 
                 map_element = await page.query_selector("canvas")
