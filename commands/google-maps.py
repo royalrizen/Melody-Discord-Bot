@@ -2,67 +2,47 @@ import discord
 from discord.ext import commands
 from playwright.async_api import async_playwright
 import os
-import traceback
 import asyncio
 from PIL import Image
 
 class GoogleMaps(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.browser = None  # Initialize the browser instance
-        self.page = None  # Initialize the page instance
-
-    async def get_browser(self):
-        if self.browser is None:
-            async with async_playwright() as p:
-                self.browser = await p.chromium.launch(headless=True)
-        return self.browser
-
-    async def get_page(self):
-        if self.page is None or self.page.is_closed():
-            browser = await self.get_browser()
-            self.page = await browser.new_page()
-        return self.page
 
     @commands.command(name="map", aliases=["google_map", "maps", "gmap", "searchmap"], usage="<location>", description="Search any location on Google Maps")
     async def map(self, ctx, *, location: str):
         m1 = await ctx.send(f"🔎 *Searching for **'{location}'** on Google Maps...*")
         screenshot_path = "google_maps_screenshot.png"
-        cropped_image_path = "cropped_image.png"
+        cropped_image_path = "google_maps.png"
 
         try:
             location_url = location.replace(" ", "+")
             google_maps_url = f"https://google.com/maps/place/{location_url}"
-            
-            page = await self.get_page()
 
-            await page.goto(google_maps_url, timeout=120000)
-            await page.wait_for_load_state("networkidle")
-            await ctx.send("*Loaded Google Maps for the specified location...*")
-            
-            await page.wait_for_selector("button[aria-label='Collapse side panel']", timeout=60000)
-            await page.evaluate("document.querySelector('button[aria-label=\"Collapse side panel\"]').click()")
-            await asyncio.sleep(2)
-            
-            await page.wait_for_selector("canvas", timeout=60000)
-            await asyncio.sleep(2)
-            
-            map_element = await page.query_selector("canvas")
-            if map_element:
-                await map_element.screenshot(path=screenshot_path)              
-                await ctx.send("*Taking screenshot...*")
-            else:
-                raise Exception("Map canvas not found.")
-
-        except Exception as e:
-            error_message = f"⚠️ {str(e)}"
-            traceback_info = traceback.format_exc()
-
-            if len(traceback_info) > 2000:
-                for i in range(0, len(traceback_info), 2000):
-                    await ctx.send(traceback_info[i:i + 2000])
-            else:
-                await ctx.send(error_message + "\n" + traceback_info)
+            # Launch browser and open a new page
+            async with async_playwright() as p:
+                browser = await p.chromium.launch(headless=True)
+                page = await browser.new_page()
+                
+                await page.goto(google_maps_url, timeout=120000)
+                await page.wait_for_load_state("networkidle")
+                await ctx.send("*Loaded Google Maps for the specified location...*")
+                
+                await page.wait_for_selector("button[aria-label='Collapse side panel']", timeout=60000)
+                await page.evaluate("document.querySelector('button[aria-label=\"Collapse side panel\"]').click()")
+                await asyncio.sleep(2)
+                
+                await page.wait_for_selector("canvas", timeout=60000)
+                await asyncio.sleep(2)
+                
+                map_element = await page.query_selector("canvas")
+                if map_element:
+                    await map_element.screenshot(path=screenshot_path)              
+                    await ctx.send("*Taking screenshot...*")
+                else:
+                    await ctx.send("⚠️ Map canvas not found.")
+                
+                # Close the page and browser automatically upon exit from async context
 
         finally:
             # Crop the screenshot
@@ -70,10 +50,6 @@ class GoogleMaps(commands.Cog):
             
             await m1.delete()            
             await ctx.send(file=discord.File(cropped_image_path))
-
-            # Clean up
-            if self.page and not self.page.is_closed():
-                await self.page.close()  # Close the page but keep the browser open
 
             # Clean up local files
             if os.path.exists(screenshot_path):
