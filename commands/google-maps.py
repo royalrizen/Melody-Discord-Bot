@@ -4,6 +4,7 @@ from playwright.async_api import async_playwright
 import os
 import traceback
 import asyncio
+from PIL import Image
 
 class GoogleMaps(commands.Cog):
     def __init__(self, bot):
@@ -13,6 +14,7 @@ class GoogleMaps(commands.Cog):
     async def map(self, ctx, *, location: str):
         m1 = await ctx.send(f"🔎 *Searching for **'{location}'** on Google Maps...*")
         screenshot_path = "google_maps_screenshot.png"
+        cropped_image_path = "cropped_image.png"
 
         try:
             location_url = location.replace(" ", "+")
@@ -26,16 +28,12 @@ class GoogleMaps(commands.Cog):
                 await page.wait_for_load_state("networkidle")
                 await ctx.send("*Loaded Google Maps for the specified location...*")
                 
-                await page.wait_for_selector("canvas", timeout=60000)
-
-                await page.evaluate("""() => {
-                    const collapseButton = document.querySelector('[aria-label="Collapse side panel"]');
-                    if (collapseButton) {
-                        collapseButton.click();
-                    }
-                }""")
+                await page.wait_for_selector("button[aria-label='Collapse side panel']", timeout=60000)
+                await page.click("button[aria-label='Collapse side panel']")
+                await asyncio.sleep(2)
                 
-                await asyncio.sleep(5)
+                await page.wait_for_selector("canvas", timeout=60000)
+                await asyncio.sleep(2)
                 
                 map_element = await page.query_selector("canvas")
                 if map_element:
@@ -45,9 +43,12 @@ class GoogleMaps(commands.Cog):
                     raise Exception("Map canvas not found.")
 
                 await browser.close()
+
+            # Crop the screenshot
+            crop_white_space(screenshot_path, cropped_image_path)
             
             await m1.delete()            
-            await ctx.send(file=discord.File(screenshot_path))
+            await ctx.send(file=discord.File(cropped_image_path))
         
         except Exception as e:
             error_message = f"⚠️ {str(e)}"
@@ -62,6 +63,30 @@ class GoogleMaps(commands.Cog):
         finally:
             if os.path.exists(screenshot_path):
                 os.remove(screenshot_path)
+            if os.path.exists(cropped_image_path):
+                os.remove(cropped_image_path)
+
+def crop_white_space(image_path, output_path):
+    image = Image.open(image_path)
+    image = image.convert("RGBA")
+    data = image.getdata()
+    bbox = [image.width, image.height, 0, 0]
+
+    for y in range(image.height):
+        for x in range(image.width):
+            r, g, b, a = data[y * image.width + x]
+            if (r, g, b) != (255, 255, 255):
+                if x < bbox[0]:
+                    bbox[0] = x
+                if y < bbox[1]:
+                    bbox[1] = y
+                if x > bbox[2]:
+                    bbox[2] = x
+                if y > bbox[3]:
+                    bbox[3] = y
+
+    cropped_image = image.crop((bbox[0], bbox[1], bbox[2] + 1, bbox[3] + 1))
+    cropped_image.save(output_path)
 
 async def setup(bot):
     await bot.add_cog(GoogleMaps(bot))
