@@ -27,7 +27,6 @@ class GoogleMaps(commands.Cog):
 
                 await page.goto(google_maps_url, timeout=120000)
                 await page.wait_for_load_state("networkidle")
-                await ctx.send("*Loaded Google Maps for the specified location...*")
 
                 await page.wait_for_selector("button[aria-label='Collapse side panel']", timeout=60000)
                 await page.evaluate("document.querySelector('button[aria-label=\"Collapse side panel\"]').click()")
