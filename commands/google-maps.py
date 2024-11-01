@@ -18,30 +18,23 @@ class GoogleMaps(commands.Cog):
                 browser = await p.chromium.launch(headless=True)
                 page = await browser.new_page()
 
-                # Load Google Maps and wait for network to be idle
                 await page.goto("https://www.google.com/maps", timeout=120000)
                 await page.wait_for_load_state("networkidle")
-
-                m2 = await ctx.send("*Loaded Google Maps...*")
-                # Fill the search box with the location and press Enter
-                await page.wait_for_selector("#searchboxinput", timeout=60000)
-                await page.fill("#searchboxinput", location)
-                await page.press("#searchboxinput", "Enter")
-
+                m2 = await ctx.send("*Loaded Google Maps website...*")
                 
+                await page.wait_for_selector("#searchboxinput", timeout=60000)                
+                await page.fill("#searchboxinput", location)
+                await page.keyboard.press("Enter")
                 m3 = await ctx.send("*Filling search box...*")
-                # Wait for the map canvas to load and stabilize
+                
                 await page.wait_for_selector("canvas", timeout=60000)
                 await page.wait_for_timeout(3000)
-
-                
                 m4 = await ctx.send("*Waiting for Google Maps canvas to load...*")
 
-                # Take a screenshot of the map area
                 map_element = await page.query_selector("canvas")
                 if map_element:
                     await map_element.screenshot(path=screenshot_path)              
-                    m5 = await ctx.send("*Took screenshot...*")
+                    m5 = await ctx.send("*Taking screenshot...*")
                 else:
                     raise Exception("Map canvas not found.")
 
