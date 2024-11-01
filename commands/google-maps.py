@@ -3,7 +3,7 @@ from discord.ext import commands
 from playwright.async_api import async_playwright
 import os
 import traceback
-import asyncio 
+import asyncio
 
 class GoogleMaps(commands.Cog):
     def __init__(self, bot):
@@ -13,50 +13,38 @@ class GoogleMaps(commands.Cog):
     async def map(self, ctx, *, location: str):
         m1 = await ctx.send(f"🔎 *Searching for **'{location}'** on Google Maps...*")
         screenshot_path = "google_maps_screenshot.png"
-        
+
         try:
+            location_url = location.replace(" ", "+")
+            google_maps_url = f"https://google.com/maps/place/{location_url}"
+            
             async with async_playwright() as p:
                 browser = await p.chromium.launch(headless=True)
                 page = await browser.new_page()
 
-                await page.goto("https://www.google.com/maps", timeout=120000)
+                await page.goto(google_maps_url, timeout=120000)
                 await page.wait_for_load_state("networkidle")
-                m2 = await ctx.send("*Loaded Google Maps website...*")
-                
-                await page.wait_for_selector("#searchboxinput", timeout=60000)                
-                await page.fill("#searchboxinput", location)
-                await page.wait_for_timeout(1000) 
-                await page.evaluate("document.querySelector('#searchbox-searchbutton').click()")
-                m3 = await ctx.send("*Filling search box...*")
+                await ctx.send("*Loaded Google Maps for the specified location...*")
                 
                 await page.wait_for_selector("canvas", timeout=60000)
-                await page.wait_for_timeout(3000)
-                m4 = await ctx.send("*Waiting for Google Maps canvas to load...*")
-
-                await asyncio.sleep(5)
+                await asyncio.sleep(2)
+                
                 map_element = await page.query_selector("canvas")
                 if map_element:
                     await map_element.screenshot(path=screenshot_path)              
-                    m5 = await ctx.send("*Taking screenshot...*")
+                    await ctx.send("*Taking screenshot...*")
                 else:
                     raise Exception("Map canvas not found.")
 
                 await browser.close()
             
             await m1.delete()            
-            await m2.delete()            
-            await m3.delete()
-            await m4.delete()
-            await m5.delete()
-            
             await ctx.send(file=discord.File(screenshot_path))
         
         except Exception as e:
-            await m.delete()
             error_message = f"⚠️ {str(e)}"
             traceback_info = traceback.format_exc()
 
-            # Send error messages in chunks if too long
             if len(traceback_info) > 2000:
                 for i in range(0, len(traceback_info), 2000):
                     await ctx.send(traceback_info[i:i + 2000])
@@ -64,7 +52,6 @@ class GoogleMaps(commands.Cog):
                 await ctx.send(error_message + "\n" + traceback_info)
 
         finally:
-            # Cleanup screenshot file if it exists
             if os.path.exists(screenshot_path):
                 os.remove(screenshot_path)
 
