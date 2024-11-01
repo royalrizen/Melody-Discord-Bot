@@ -27,6 +27,9 @@ class GoogleMaps(commands.Cog):
 
                 await page.goto(google_maps_url, timeout=120000)
                 await page.wait_for_load_state("networkidle")
+
+                await page.wait_for_selector("button[class='yra0jd Hk4XGb']")
+                await page.click("button[class='yra0jd Hk4XGb']")
                 
                 retry_count = 3
                 for attempt in range(retry_count):
@@ -47,7 +50,8 @@ class GoogleMaps(commands.Cog):
             
             crop_white_space(screenshot_path, cropped_image_path)
 
-            embed = discord.Embed(title="Google Maps", description=f"Location: **`{location}`**", color=discord.Color.blue())
+            embed = discord.Embed(title="Google Maps", description=f"Location: **`{location}`**", color=config.PRIMARY_COLOR)
+            embed.set_thumbnail(url="https://cdn.discordapp.com/emojis/858112834541715498.png")
             file = discord.File(cropped_image_path, filename="map.png")
             embed.set_image(url="attachment://map.png")
             await ctx.send(embed=embed, file=file)
