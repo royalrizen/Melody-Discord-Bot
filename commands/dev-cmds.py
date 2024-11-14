@@ -54,7 +54,7 @@ class Developer(commands.Cog):
     @commands.command(name="servers", description="Servers the bot is in")
     @commands.check(is_dev)
     async def servers(self, ctx):
-        embed = discord.Embed(title="Servers the bot is in")
+        embed = discord.Embed(title="Servers the bot is in", color=config.SECONDARY_COLOR)
         for guild in self.bot.guilds:
             invite = await guild.text_channels[0].create_invite(max_age=300)
             embed.add_field(name=guild.name, value=f"{guild.id} ([Invite]({invite.url}))", inline=False)
