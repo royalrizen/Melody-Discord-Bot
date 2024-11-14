@@ -1,26 +1,27 @@
 import discord
 from discord.ext import commands, tasks
-import json
+import yaml
 import os
-import config 
+import config
 from utils.staff import is_dev
 
 class Developer(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.config_file = 'settings.yaml'
         self.allowed_servers = self.load_allowed_servers()
         self.check_servers.start()
 
     def load_allowed_servers(self):
-        if not os.path.exists('data/servers.json'):
-            with open('data/servers.json', 'w') as f:
-                json.dump([], f)
-        with open('data/servers.json', 'r') as f:
-            return json.load(f)
+        if not os.path.exists(self.config_file):
+            with open(self.config_file, 'w') as f:
+                yaml.dump([], f)
+        with open(self.config_file, 'r') as f:
+            return yaml.safe_load(f) or []
 
     def save_allowed_servers(self):
-        with open('data/servers.json', 'w') as f:
-            json.dump(self.allowed_servers, f, indent=4)
+        with open(self.config_file, 'w') as f:
+            yaml.dump(self.allowed_servers, f)
 
     @commands.command(name="allow_server", usage="<server id>", description="Allow the server to use this bot")
     @commands.check(is_dev)
