@@ -46,7 +46,7 @@ class Utility(commands.Cog):
             user = ctx.author
 
         av = user.avatar.url if user.avatar else user.default_avatar.url
-        embed = discord.Embed(title=f"Avatar of **{user.name}**", color=0xcda69b)
+        embed = discord.Embed(title=f"Avatar of **{user.name}**", color=config.SECONDARY_COLOR)
         embed.set_image(url=av)
         await ctx.send(embed=embed)
 
