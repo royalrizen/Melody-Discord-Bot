@@ -2,10 +2,18 @@ prefix: "!"
 
 developer: [918862839316373554] # gives access to eval command, etc. separate by comma
 
+allowed_servers:
+  - 975033657658052630
+  - 1244631342210220033
+  
 log_channels:
   message_logs: 1265641315690090577
   case_logs: 1265641369939083295
   bug_reports: 1209441824641384479
+
+channels:
+  memberstats: 1182641856308326460
+  welcomer: 1139591850567676104
 
 role_levels:
   981412640578490450: 99999  # owner
