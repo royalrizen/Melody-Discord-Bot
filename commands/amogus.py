@@ -213,8 +213,9 @@ class ViewRoles(View):
         votes = game['votes']
         await self.resolve_voting_phase(channel, game, votes)
 
+ # START
+
     async def resolve_voting_phase(self, channel, game, votes):
-        
         if not votes:
             await channel.send(embed=discord.Embed(description="❌ No votes were cast.", color=0xff4600))
             await self.start_night_phase(channel, game)
@@ -239,28 +240,25 @@ class ViewRoles(View):
         most_voted_player = discord.utils.get(channel.guild.members, id=most_voted_player_id)
         role = game["roles"].get(most_voted_player_id, "Role not found")
 
-        remaining_murderers = sum(1 for player_role in game["roles"].values() if player_role == "Mafia")
-
         if role == "Mafia":
             game["roles"][most_voted_player_id] = "Ghost_Mafia"
-            remaining_murderers -= 1
-            await channel.send(embed=discord.Embed(description=f"🔪 {most_voted_player.mention} was a Murderer. **{remaining_murderers}** murderer(s) remain.", color=0xff4600))
-            
+            await channel.send(embed=discord.Embed(description=f"🔪 {most_voted_player.mention} was a Murderer. A murderer has been eliminated!", color=0xff4600))
         else:
             game["roles"][most_voted_player_id] = "Ghost"
-            await channel.send(embed=discord.Embed(description=f"💔 {most_voted_player.mention} was not a Murderer. **{remaining_murderers}** murderer(s) remain.", color=0xff4600))
-            
+            await channel.send(embed=discord.Embed(description=f"💔 {most_voted_player.mention} was not a Murderer.", color=0xff4600))
+
         await self.assign_ghost_role(most_voted_player)
 
-        alive_players = len([p for p in game["roles"].values() if p not in ["Ghost", "Ghost_Mafia"]])
+        remaining_murderers = sum(1 for role in game["roles"].values() if role == "Mafia")
+        remaining_townsfolk = sum(1 for role in game["roles"].values() if role not in ["Mafia", "Ghost", "Ghost_Mafia"])
 
         if remaining_murderers == 0:
-            await self.end_game(game, channel, "Civilians")            
-        elif len([p for p in game["roles"].values() if p != "Ghost" and p != "Ghost_Mafia" and p != "Mafia"]) <= remaining_murderers:
+            await self.end_game(game, channel, "Civilians")
+        elif remaining_townsfolk <= remaining_murderers:
             await self.end_game(game, channel, "Murderer(s)")
         else:
             await self.start_night_phase(channel, game)
-
+        
     async def start_night_phase(self, channel, game):
         game["phase"] = "night"
         night_phase = discord.Embed(
@@ -282,25 +280,30 @@ class ViewRoles(View):
 
     async def resolve_night_phase(self, channel, game):
         target_id = game.get("night_target")
-        target = await channel.guild.fetch_member(target_id)
-        
-        if target_id:
-            try:
-                target = discord.utils.get(channel.guild.members, id=target_id)
-                game["roles"][target_id] = "Ghost"
-                await self.assign_ghost_role(target)
-                await channel.send(embed=discord.Embed(description=f"🔪 {target.mention} was killed during the night.", color=0xff0000))
-            except discord.NotFound:
-            	print("user not found to assign the ghost role")
-            	
-            remaining_murderers = sum(1 for player_role in game["roles"].values() if player_role == "Mafia")
-            alive_players = len([p for p in game["roles"].values() if p not in ["Ghost", "Ghost_Mafia"]])
+        if not target_id:
+            await channel.send(embed=discord.Embed(description="❌ The murderers didn't target anyone.", color=0xff4600))
+            await self.start_day_phase(channel, game)
+            return
 
-            if alive_players <= remaining_murderers:
-                await self.end_game(game, channel, "Murderer(s)")
-            else:
-                await self.start_day_phase(channel, game)
-        
+        target = discord.utils.get(channel.guild.members, id=target_id)
+        if not target:
+            await channel.send(embed=discord.Embed(description="🔪 The target could not be found.", color=0xff0000))
+            return
+
+        game["roles"][target_id] = "Ghost"
+        await self.assign_ghost_role(target)
+        await channel.send(embed=discord.Embed(description=f"🔪 {target.mention} was killed during the night.", color=0xff0000))
+
+        remaining_murderers = sum(1 for role in game["roles"].values() if role == "Mafia")
+        remaining_townsfolk = sum(1 for role in game["roles"].values() if role not in ["Mafia", "Ghost", "Ghost_Mafia"])
+
+        if remaining_murderers == 0:
+            await self.end_game(game, channel, "Civilians")
+        elif remaining_townsfolk <= remaining_murderers:
+            await self.end_game(game, channel, "Murderer(s)")
+        else:
+            await self.start_day_phase(channel, game)
+    
     async def end_game(self, game, channel, winner):
         guild = channel.guild
         murderers = [member.mention for member in guild.members if member.id in game["roles"] and game["roles"][member.id] in ["Mafia", "Ghost_Mafia"]]
