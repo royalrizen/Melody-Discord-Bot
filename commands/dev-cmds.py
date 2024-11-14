@@ -14,14 +14,22 @@ class Developer(commands.Cog):
 
     def load_allowed_servers(self):
         if not os.path.exists(self.config_file):
-            with open(self.config_file, 'w') as f:
-                yaml.dump([], f)
+            return []
         with open(self.config_file, 'r') as f:
-            return yaml.safe_load(f) or []
+            try:
+                data = yaml.safe_load(f)
+                return data.get('allowed_servers', [])
+            except yaml.YAMLError:
+                return []
 
     def save_allowed_servers(self):
+        if not os.path.exists(self.config_file):
+            return
+        with open(self.config_file, 'r') as f:
+            data = yaml.safe_load(f) or {}
+        data['allowed_servers'] = self.allowed_servers
         with open(self.config_file, 'w') as f:
-            yaml.dump(self.allowed_servers, f)
+            yaml.dump(data, f, default_flow_style=False)
 
     @commands.command(name="allow_server", usage="<server id>", description="Allow the server to use this bot")
     @commands.check(is_dev)
@@ -67,6 +75,7 @@ class Developer(commands.Cog):
 
     @tasks.loop(minutes=10)
     async def check_servers(self):
+        self.allowed_servers = self.load_allowed_servers()
         for guild in self.bot.guilds:
             if guild.id not in self.allowed_servers:
                 await guild.leave()
