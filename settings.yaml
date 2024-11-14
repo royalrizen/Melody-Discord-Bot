@@ -1,8 +1,15 @@
 prefix: "!"
 
-developer: [918862839316373554] # gives access to eval command, etc
+developer: [918862839316373554] # gives access to eval command, etc. separate by comma
 
 log_channels:
   message_logs: 1265641315690090577
   case_logs: 1265641369939083295
   bug_reports: 1209441824641384479
+
+role_levels:
+  981412640578490450: 99999  # owner
+  1147408289164972072: 100  # community manager
+  1147408202531614760: 75   # admin
+  1147408333817524276: 50   # mod
+  1147408378176487464: 25   # tmod
