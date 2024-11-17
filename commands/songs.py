@@ -19,7 +19,7 @@ class Songs(commands.Cog):
     @commands.command(name='songs', description="Sends the Share Songs embed")
     @commands.has_permissions(manage_guild=True)
     async def support(self, ctx):
-        embed = discord.Embed(title="Share your favourite songs!", description="We want to hear the beats that make your heart skip! Click the button below and share the link to your favorite songs.\n\n( Spotify • Youtube • SoundCloud )", color=config.SECONDARY_COLOR)
+        embed = discord.Embed(title="Share your favourite songs!", description="We want to hear the beats that make your heart skip! Click the button below and share the link to your favorite songs.\n\n( Spotify • Youtube • SoundCloud )")
         embed.set_image(url="https://i.ibb.co/Qmxmn1R/happy-music.gif")
         await ctx.message.delete()
         message = await ctx.send(embed=embed, view=SongsView(self.bot))
