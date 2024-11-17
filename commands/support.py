@@ -29,7 +29,7 @@ class SupportView(View):
             settings = yaml.safe_load(file)
         self.settings = settings        
         self.support_channel  = self.settings['channels']['support']                              
-    @discord.ui.button(label='Create a Ticket', style=discord.ButtonStyle.gray, emoji="<a:Staff:1186927813228494878>", custom_id="ticketbtn")
+    @discord.ui.button(label='Create a Ticket', style=discord.ButtonStyle.gray, emoji=config.TICKET, custom_id="ticketbtn")
     async def ticket(self, interaction: discord.Interaction, button: discord.ui.Button):
         user_id = interaction.user.id
         channel_id = self.support_channel
