@@ -14,6 +14,7 @@ log_channels:
 channels:
   memberstats: 1182641856308326460
   welcomer: 1232724589180616785
+  memes: 1146665401044971582
 
 role_levels:
   981412640578490450: 99999  # owner
