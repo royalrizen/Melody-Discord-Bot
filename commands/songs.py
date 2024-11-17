@@ -39,9 +39,9 @@ class SongsModal(discord.ui.Modal, title="Share your favourite songs!"):
         super().__init__()
         self.bot = bot
         with open('settings.yaml', 'r') as file:
-            dashboard = yaml.safe_load(file)
-        self.dashboard = dashboard        
-        self.songs_channel  = self.dashboard['channels']['songs']               
+            settings = yaml.safe_load(file)
+        self.settings = settings    
+        self.songs_channel  = self.settings['channels']['songs']               
         self.song_link = discord.ui.TextInput(label='Link')
         self.add_item(self.song_link)
 
@@ -67,8 +67,8 @@ class SongsModal(discord.ui.Modal, title="Share your favourite songs!"):
 
                 message1 = await channel.send(link)
                 message2 = await channel.send(embed=embed)
-                await message2.add_reaction("⭐")
-                await interaction.response.send_message("❤️ Shared!", ephemeral=True)
+                await message2.add_reaction("♥️")
+                await interaction.response.send_message(f"{config.SHARE} Shared!", ephemeral=True)
         else:
             await interaction.response.send_message('Invalid link format. Please provide a valid URL.', ephemeral=True)
         
