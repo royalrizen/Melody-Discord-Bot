@@ -1,61 +1,39 @@
 import discord
 from discord.ext import commands
 import requests
-import re
-import os
 
-class ColorPicker(commands.Cog):
+class Color(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @staticmethod
-    def rgb_to_hex(rgb):
-        """Convert an RGB tuple to a HEX string."""
-        return f'{rgb[0]:02x}{rgb[1]:02x}{rgb[2]:02x}'
-
-    @staticmethod
-    def parse_color_input(color_input):
-        """Parse the color input and determine if it's HEX or RGB."""
-        hex_pattern = re.compile(r'^#?([A-Fa-f0-9]{6})$')
-        rgb_pattern = re.compile(r'^(\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})$')
-
-        hex_match = hex_pattern.match(color_input)
-        rgb_match = rgb_pattern.match(color_input)
-
-        if hex_match:
-            return hex_match.group(1).upper()
-        elif rgb_match:
-            rgb = tuple(map(int, rgb_match.groups()))
-            if all(0 <= val <= 255 for val in rgb):
-                return ColorPicker.rgb_to_hex(rgb).upper()
-        return None
-
-    @commands.command()
-    async def color(self, ctx, *, color_input: str):
-        """Command to display color information."""
-        hex_code = self.parse_color_input(color_input)
-        if not hex_code:
-            await ctx.send("Invalid color format! Use HEX (e.g., `#123456`) or RGB (e.g., `255, 255, 255`).")
-            return
-
-        api_url = f"https://www.thecolorapi.com/id?format=svg&named=false&hex={hex_code}"
-        response = requests.get(api_url)
-
-        if response.status_code == 200:
-            svg_path = f"{hex_code}.svg"
-            with open(svg_path, "wb") as file:
-                file.write(response.content)
-
-            embed = discord.Embed(
-                title=f"Color: #{hex_code}",
-                description="Here is the color you selected:",
-                color=int(hex_code, 16)
-            )
-            embed.set_image(url=f"attachment://{svg_path}")
-            await ctx.send(embed=embed, file=discord.File(svg_path))
-            os.remove(svg_path)
+    @commands.command(name="color")
+    async def color_(self, ctx, color: str):
+        if color.startswith("rgb(") and color.endswith(")"):
+            rgb_values = color[4:-1].split(",")
+            try:
+                r, g, b = int(rgb_values[0].strip()), int(rgb_values[1].strip()), int(rgb_values[2].strip())
+                hex_color = f"{r:02x}{g:02x}{b:02x}"
+            except ValueError:
+                await ctx.send("Invalid RGB format. Please use rgb(R, G, B) where R, G, and B are integers.")
+                return
+        elif color.startswith("#"):
+            hex_color = color.lstrip("#")
         else:
-            await ctx.send("Failed to fetch color information. Please try again later.")
+            hex_color = color.lower()
+
+        url = f"https://www.thecolorapi.com/id?hex={hex_color}"
+
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
+            image_url = data['image']['bare']
+
+            embed = discord.Embed(title=f"Color: {color.capitalize()}", description=f"Here is the image for the color {color.capitalize()}.", color=discord.Color(int(hex_color, 16)))
+            embed.set_image(url=image_url)
+
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send(f"Sorry, I couldn't find an image for the color {color}.")
 
 async def setup(bot):
-    await bot.add_cog(ColorPicker(bot))
+    await bot.add_cog(Color(bot))
