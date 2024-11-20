@@ -46,19 +46,14 @@ class ColorPicker(commands.Cog):
             with open(svg_path, "wb") as file:
                 file.write(response.content)
 
-            png_path = f"{hex_code}.png"
-            os.system(f"rsvg-convert -o {png_path} {svg_path}")
-
             embed = discord.Embed(
                 title=f"Color: #{hex_code}",
                 description="Here is the color you selected:",
                 color=int(hex_code, 16)
             )
-            embed.set_image(url=f"attachment://{png_path}")
-            await ctx.send(embed=embed, file=discord.File(png_path))
-
+            embed.set_image(url=f"attachment://{svg_path}")
+            await ctx.send(embed=embed, file=discord.File(svg_path))
             os.remove(svg_path)
-            os.remove(png_path)
         else:
             await ctx.send("Failed to fetch color information. Please try again later.")
 
