@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from utils.terraria_server_renew import renew_terraria_server
+from utils.terrariarenew import renew_terraria_server
 
 class Terraria(commands.Cog):
     def __init__(self, bot):
