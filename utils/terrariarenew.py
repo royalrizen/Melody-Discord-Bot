@@ -60,8 +60,7 @@ class RecaptchaSolver:
             return False
         except Exception:
             return False
-
-
+            
 async def renew_terraria_server(url: str):
     async with async_playwright() as p:
         browser = await p.chromium.launch()
@@ -79,7 +78,15 @@ async def renew_terraria_server(url: str):
             await page.click('#submit-button')
 
             print(f"Successfully solved CAPTCHA and submitted form for username: {minecraft_username}")
+            
+            # Take screenshot after solving CAPTCHA and clicking submit button
+            screenshot_path = "/tmp/screenshot.png"
+            await page.screenshot(path=screenshot_path)
+            
+            return screenshot_path
+
         except Exception as e:
             print(f"Error: {e}")
+            return None
         finally:
             await browser.close()
