@@ -72,11 +72,11 @@ async def renew_terraria_server(url: str):
 
         try:
             minecraft_username = ''.join(random.choices('abcdefghijklmnopqrstuvwxyz0123456789', k=10))
-            await page.fill('#minecraft-username', minecraft_username)
+            await page.fill('#username-input', minecraft_username)
 
             await recaptcha_solver.solveCaptcha()
 
-            await page.click('button#renew')
+            await page.click('#submit-button')
 
             print(f"Successfully solved CAPTCHA and submitted form for username: {minecraft_username}")
         except Exception as e:
