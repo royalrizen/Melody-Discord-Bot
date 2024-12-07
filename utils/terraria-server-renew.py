@@ -1,10 +1,11 @@
+# RENEWS TERRARIA SERVER
 import os
 import urllib
 import random
 import pydub
 import speech_recognition
-import time
 from playwright.async_api import async_playwright
+import time
 
 class RecaptchaSolver:
     def __init__(self, page):
@@ -60,7 +61,8 @@ class RecaptchaSolver:
         except Exception:
             return False
 
-async def solve_captcha(url: str):
+
+async def renew_terraria_server(url: str):
     async with async_playwright() as p:
         browser = await p.chromium.launch()
         page = await browser.new_page()
@@ -69,8 +71,14 @@ async def solve_captcha(url: str):
         recaptcha_solver = RecaptchaSolver(page)
 
         try:
+            minecraft_username = ''.join(random.choices('abcdefghijklmnopqrstuvwxyz0123456789', k=10))
+            await page.fill('#minecraft-username', minecraft_username)
+
             await recaptcha_solver.solveCaptcha()
-            print("CAPTCHA solved successfully!")
+
+            await page.click('button#renew')
+
+            print(f"Successfully solved CAPTCHA and submitted form for username: {minecraft_username}")
         except Exception as e:
             print(f"Error: {e}")
         finally:
