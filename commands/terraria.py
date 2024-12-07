@@ -1,6 +1,4 @@
-import discord
-from discord.ext import commands
-from utils.terrariarenew import renew_terraria_server
+import os
 
 class Terraria(commands.Cog):
     def __init__(self, bot):
@@ -9,8 +7,18 @@ class Terraria(commands.Cog):
     @commands.command(name="renew", help="Renews Terraria server")
     async def _renew(self, ctx, url: str):
         try:
-            await renew_terraria_server(url)
-            await ctx.send(f"Successfully renewed Terraria server on: **{url}**")
+            # First, call the renew_terraria_server function
+            screenshot_path = await renew_terraria_server(url)
+            
+            # If a screenshot is returned, send it in Discord
+            if screenshot_path:
+                await ctx.send(f"Successfully renewed Terraria server on: **{url}**", file=discord.File(screenshot_path))
+                
+                # After sending the screenshot, delete the file
+                os.remove(screenshot_path)
+                print(f"Deleted screenshot at {screenshot_path}")
+            else:
+                await ctx.send(f"Successfully renewed Terraria server on: **{url}**, but no screenshot was taken.")
         except Exception as e:
             await ctx.send(e)
 
