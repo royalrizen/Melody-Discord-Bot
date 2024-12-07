@@ -7,3 +7,4 @@ humanize
 git+https://github.com/Tom-the-Bomb/Discord-Games.git
 flask
 Pillow
+pydub
