@@ -29,15 +29,24 @@ class Exif(commands.Cog):
             return
 
         file_path = f"./temp_{attachment.filename}"
-        await attachment.save(file_path)
+        try:
+            # Save the attachment locally
+            await attachment.save(file_path)
 
-        exif_data = self.get_exif_data(file_path)
-        os.remove(file_path)
+            # Extract EXIF data
+            exif_data = self.get_exif_data(file_path)
 
-        if exif_data:
-            await interaction.response.send_message(f"EXIF Data:\n```\n{exif_data}\n```")
-        else:
-            await interaction.response.send_message("No EXIF data found or an error occurred.", ephemeral=True)
+            # Check if EXIF data is found
+            if exif_data:
+                await interaction.response.send_message(f"EXIF Data:\n```\n{exif_data}\n```")
+            else:
+                await interaction.response.send_message("No EXIF data found in the image.", ephemeral=True)
+        except Exception as e:
+            await interaction.response.send_message(f"An error occurred while processing the image: {e}", ephemeral=True)
+        finally:
+            # Ensure the file is removed
+            if os.path.exists(file_path):
+                os.remove(file_path)
 
     def get_exif_data(self, image_path):
         """Extract EXIF data from the given image."""
@@ -52,5 +61,5 @@ class Exif(commands.Cog):
         except Exception as e:
             return f"Error extracting EXIF data: {e}"
 
-async def setup(bot: commands.Bot) -> None:
+async def setup(bot):
     await bot.add_cog(Exif(bot))
