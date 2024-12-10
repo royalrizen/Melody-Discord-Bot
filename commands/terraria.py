@@ -36,7 +36,12 @@ class Terraria(commands.Cog):
             await self.interact_with_site()
             await ctx.send("Server renewal process completed successfully!")
         except Exception as e:
-            await ctx.send(e)
+            error_message = str(e)
+            if len(error_message) > max_length:
+              for i in range(0, len(error_message), max_length):
+                  await ctx.send(error_message[i:i + max_length])
+            else:
+              await ctx.send(error_message)
 
     def create_cookies(self):
         cookies_data = [
