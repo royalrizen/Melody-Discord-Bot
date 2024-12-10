@@ -37,6 +37,7 @@ class Terraria(commands.Cog):
             await ctx.send("Server renewal process completed successfully!")
         except Exception as e:
             error_message = str(e)
+            max_length = 2000
             if len(error_message) > max_length:
               for i in range(0, len(error_message), max_length):
                   await ctx.send(error_message[i:i + max_length])
