@@ -16,7 +16,9 @@ created by **@royalrizen** on Discord
 |:------------------------|:---------------------------|
 | `TOKEN`                 | Discord bot token          |
 | `UPLOADER_TECH_API_KEY` | API key for [uploader.tech](https://uploader.tech/)   |
-| `NASA_API_KEY`          | NASA API Key               |
+| `PTERODACTYL_SESSION`   | Gaming4Free Cookie         |
+| `XSRF_TOKEN`            | Gaming4Free Cookie         |
+| `GRECAPTCHA_VALUE`      | Gaming4Free Cookie         |
 
 <br> 
 
