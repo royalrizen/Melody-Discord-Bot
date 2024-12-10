@@ -16,7 +16,7 @@ class Terraria(commands.Cog):
 
     async def interact_with_site(self):
         async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=False)
+            browser = await p.chromium.launch(headless=True)
             context = await browser.new_context()
             await self.load_cookies(context, 'cookies.json')
             page = await context.new_page()
