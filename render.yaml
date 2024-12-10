@@ -7,7 +7,11 @@ services:
   envVars:
   - key: UPLOADER_TECH_API_KEY
     sync: false
-  - key: NASA_API_KEY
+  - key: GRECAPTCHA_VALUE
+    sync: false
+  - key: XSRF_TOKEN
+    sync: false
+  - key: PTERODACTYL_SESSION
     sync: false
   - key: TOKEN
     sync: false
