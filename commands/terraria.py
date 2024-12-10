@@ -5,7 +5,7 @@ from playwright.async_api import async_playwright
 import json
 import os
 
-class Gaming(commands.Cog):
+class Terraria(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
