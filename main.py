@@ -14,16 +14,15 @@ with open('settings.yaml', 'r') as file:
   settings = yaml.safe_load(file)        
   prefix  = settings['prefix']
   bug_reports_channel = settings['log_channels']['bug_reports']
-        
-bot = commands.Bot(command_prefix=prefix, case_insensitive=True, intents=discord.Intents.all())
+
+
+status = discord.Game(name="with your emotions")
+bot = commands.Bot(command_prefix=prefix, activity=status, case_insensitive=True, intents=discord.Intents.all())
 
 @bot.event
 async def on_ready():
     print(f"\nConnected to {bot.user}\n")
-    await load_extensions()    
-    await sync_commands()
-    activity = discord.Game(name="with your emotions")
-    await bot.change_presence(activity=activity)
+    await load_extensions()
 
 async def load_extensions():
     for filename in os.listdir('./commands'):
@@ -33,10 +32,6 @@ async def load_extensions():
                 print(f"[+] {filename[:-3]}.py — online")
             except commands.ExtensionError as e:
                 print(f"[-] {filename[:-3]} — offline ({e})")
-
-async def sync_commands():
-    synced = await bot.tree.sync()
-    print(f"\nSynced {len(synced)} commands")
 
 class ReportButton(View):
     def __init__(self, bot, error_message, guild_id, user_id, username, command_name, original_message):
